@@ -71,9 +71,6 @@
     z-index: 2;
     width: 88%;
     max-width: 1180px;
-    /* cap height so long lyrics never exceed the viewport */
-    max-height: calc(100vh - 5rem);
-    overflow-y: auto;
     text-align: center;
     padding: 2.8rem 3.2rem;
     background: rgba(0,0,0,0.35);
@@ -122,39 +119,40 @@
   }
 
   /* ── Lyrics typography ── */
-  /* vh-based font sizes so content always fits the screen height */
   .slide-lyrics {
     font-family: 'Heebo', sans-serif;
     font-weight: 700;
-    font-size: clamp(1.2rem, 3.4vh, 2rem);
+    font-size: clamp(1rem, 2.2vw, 1.75rem);
     color: rgba(255,255,255,0.95);
     text-shadow:
       0 0 20px rgba(0,0,0,0.8),
       0 1px 2px rgba(0,0,0,0.6);
-    line-height: 1.9;
+    line-height: 2;
     letter-spacing: 0.015em;
+    max-height: 82vh;
+    overflow-y: auto;
   }
   .slide-lyrics > div {
     transition: opacity 0.3s;
   }
 
   .slide-lyrics.dense {
-    font-size: clamp(0.95rem, 2.5vh, 1.55rem);
-    line-height: 1.8;
+    font-size: clamp(0.85rem, 1.7vw, 1.35rem);
+    line-height: 1.9;
   }
 
   .slide-lyrics.two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem 2rem;
+    gap: 1.2rem 2.5rem;
     text-align: right;
   }
 
   .slide-lyrics.prayer {
     font-family: 'Frank Ruhl Libre', serif;
     font-weight: 700;
-    font-size: clamp(1.2rem, 3.5vh, 2.1rem);
-    line-height: 2.1;
+    font-size: clamp(1.1rem, 2.5vw, 2rem);
+    line-height: 2.2;
     color: rgba(255,255,255,0.97);
   }
 
@@ -234,183 +232,9 @@
   }
 
   ::-webkit-scrollbar { width: 0; }
-
-  /* ── Mode picker overlay ── */
-  #mode-picker {
-    position: fixed; inset: 0;
-    z-index: 999;
-    background: rgba(0,0,0,0.92);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    font-family: 'Heebo', sans-serif;
-  }
-  #mode-picker h1 {
-    color: rgba(255,255,255,0.85);
-    font-size: clamp(1.4rem, 4vw, 2.2rem);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    text-align: center;
-  }
-  #mode-picker p {
-    color: rgba(255,255,255,0.4);
-    font-size: 0.9rem;
-    text-align: center;
-    margin-top: -1rem;
-  }
-  .mode-btn {
-    width: min(88vw, 320px);
-    padding: 1.3rem 2rem;
-    border-radius: 18px;
-    border: 1px solid rgba(255,255,255,0.15);
-    background: rgba(255,255,255,0.07);
-    color: #fff;
-    font-family: 'Heebo', sans-serif;
-    font-size: 1.2rem;
-    font-weight: 700;
-    cursor: pointer;
-    letter-spacing: 0.04em;
-    transition: background 0.2s, border-color 0.2s;
-  }
-  .mode-btn:hover { background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.3); }
-  .mode-btn .mode-sub {
-    display: block;
-    font-size: 0.75rem;
-    font-weight: 300;
-    color: rgba(255,255,255,0.45);
-    margin-top: 0.3rem;
-    letter-spacing: 0.06em;
-  }
-  #mode-picker .room-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    direction: ltr;
-  }
-  #room-input {
-    width: 120px;
-    padding: 0.5rem 0.8rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.08);
-    color: #fff;
-    font-size: 1.1rem;
-    font-family: monospace;
-    text-align: center;
-    letter-spacing: 0.2em;
-    outline: none;
-  }
-  #room-input:focus { border-color: rgba(255,255,255,0.4); }
-  #room-label {
-    color: rgba(255,255,255,0.45);
-    font-size: 0.82rem;
-    letter-spacing: 0.05em;
-    direction: rtl;
-  }
-
-  /* ── Controller UI ── */
-  #controller {
-    display: none;
-    position: fixed; inset: 0;
-    z-index: 500;
-    background: #0a0a0a;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 2rem;
-    font-family: 'Heebo', sans-serif;
-    touch-action: manipulation;
-  }
-  #controller.active { display: flex; }
-  #ctrl-slide-info {
-    color: rgba(255,255,255,0.5);
-    font-size: 1rem;
-    letter-spacing: 0.08em;
-    direction: ltr;
-  }
-  .ctrl-btn-row {
-    display: flex;
-    gap: 1.5rem;
-  }
-  .ctrl-btn {
-    width: min(42vw, 180px);
-    height: min(42vw, 180px);
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.07);
-    color: #fff;
-    font-size: 2.8rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: background 0.15s, transform 0.1s;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-  }
-  .ctrl-btn:active { background: rgba(255,255,255,0.2); transform: scale(0.95); }
-  #ctrl-song-name {
-    color: rgba(255,255,255,0.7);
-    font-size: clamp(1rem, 4vw, 1.4rem);
-    font-weight: 700;
-    text-align: center;
-    max-width: 80vw;
-    min-height: 2em;
-  }
-  #ctrl-key-badge {
-    color: rgba(255,255,255,0.35);
-    font-size: 0.9rem;
-    letter-spacing: 0.12em;
-    direction: ltr;
-    font-weight: 700;
-    min-height: 1.2em;
-  }
-  #ctrl-room-badge {
-    position: fixed;
-    top: 1.2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    color: rgba(255,255,255,0.2);
-    font-size: 0.7rem;
-    letter-spacing: 0.15em;
-    direction: ltr;
-    font-family: monospace;
-  }
 </style>
 </head>
 <body>
-
-<!-- Mode picker (shown until user chooses) -->
-<div id="mode-picker">
-  <h1>יום הזיכרון 2026</h1>
-  <p>בחר מצב</p>
-  <div class="room-row">
-    <span id="room-label">קוד חדר:</span>
-    <input id="room-input" type="text" maxlength="8" value="2026" spellcheck="false" autocomplete="off" />
-  </div>
-  <button class="mode-btn" id="btn-projector">
-    🖥 הקרנה
-    <span class="mode-sub">מחשב מחובר למקרן</span>
-  </button>
-  <button class="mode-btn" id="btn-controller">
-    📱 שלט
-    <span class="mode-sub">טלפון / שלט רחוק</span>
-  </button>
-</div>
-
-<!-- Controller UI (phone) -->
-<div id="controller">
-  <div id="ctrl-room-badge"></div>
-  <div id="ctrl-song-name"></div>
-  <div id="ctrl-key-badge"></div>
-  <div class="ctrl-btn-row">
-    <button class="ctrl-btn" id="ctrl-prev" aria-label="הקודם">&#8592;</button>
-    <button class="ctrl-btn" id="ctrl-next" aria-label="הבא">&#8594;</button>
-  </div>
-  <div id="ctrl-slide-info"></div>
-</div>
 
 <div id="slideshow"></div>
 <canvas id="particles"></canvas>
@@ -1125,7 +949,6 @@ function updateIndicator() {
 }
 
 document.addEventListener('keydown', e => {
-  if (syncMode === 'controller') return;
   if (e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
     e.preventDefault(); next();
   } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'PageUp') {
@@ -1141,7 +964,6 @@ document.addEventListener('keydown', e => {
 });
 
 document.addEventListener('click', e => {
-  if (syncMode === 'controller') return;
   const w = window.innerWidth;
   if (e.clientX < w * 0.35) prev(); else next();
 });
@@ -1156,127 +978,6 @@ document.addEventListener('touchend', e => {
 buildSlides();
 // initialise the cached bg reference for slide 0
 activeBg = document.querySelector('.slide.active .slide-bg');
-
-// ── Remote control sync ──────────────────────────────────────────────
-const API = '/api/slide';
-let syncRoom = '2026';
-let syncMode = null; // 'projector' | 'controller'
-let pollTimer = null;
-let lastApiSlide = -1; // tracks the last value received FROM the API
-
-// Derive a short song title/description from a slide object for the controller UI
-function slideSummary(s) {
-  if (s.type === 'title') return s.lines[0];
-  if (s.lines?.length)    return s.lines[0];
-  if (s.col1?.length)     return s.col1[0];
-  return '';
-}
-
-function updateControllerUI() {
-  const s = slides[currentSlide];
-  document.getElementById('ctrl-slide-info').textContent =
-    `${currentSlide + 1} / ${slides.length}`;
-  document.getElementById('ctrl-song-name').textContent = slideSummary(s);
-  document.getElementById('ctrl-key-badge').textContent  = s.key ? `♩ ${s.key}` : '';
-}
-
-async function pushSlide(idx) {
-  try {
-    await fetch(`${API}?room=${encodeURIComponent(syncRoom)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ slide: idx })
-    });
-  } catch (_) { /* offline — ignore */ }
-}
-
-async function pollSlide() {
-  try {
-    const r = await fetch(`${API}?room=${encodeURIComponent(syncRoom)}`, { cache: 'no-store' });
-    const { slide } = await r.json();
-    // Only jump if the remote value changed — not just because we navigated locally.
-    // This prevents the projector from being reset to 0 when no controller is active.
-    if (typeof slide === 'number' && slide !== lastApiSlide) {
-      lastApiSlide = slide;
-      goTo(slide);
-    }
-  } catch (_) { /* offline — ignore */ }
-}
-
-function startProjector() {
-  syncMode = 'projector';
-  document.getElementById('mode-picker').style.display = 'none';
-  document.body.style.cursor = 'none';
-  // Seed lastApiSlide and push current position so the API starts in sync
-  lastApiSlide = currentSlide;
-  pushSlide(currentSlide);
-  pollTimer = setInterval(pollSlide, 600);
-}
-
-function startController() {
-  syncMode = 'controller';
-  document.getElementById('mode-picker').style.display = 'none';
-  document.getElementById('slideshow').style.display = 'none';
-  document.querySelector('.vignette').style.display = 'none';
-  document.getElementById('particles').style.display = 'none';
-  document.getElementById('progress').style.display = 'none';
-  document.getElementById('slideNum').style.display = 'none';
-  document.querySelector('.nav-hint')?.remove();
-  document.body.style.cursor = 'default';
-  document.body.style.background = '#0a0a0a';
-
-  const ctrl = document.getElementById('controller');
-  ctrl.classList.add('active');
-  document.getElementById('ctrl-room-badge').textContent = `חדר: ${syncRoom}`;
-
-  updateControllerUI();
-
-  document.getElementById('ctrl-next').addEventListener('click', async () => {
-    const next = Math.min(currentSlide + 1, slides.length - 1);
-    goTo(next);
-    updateControllerUI();
-    await pushSlide(next);
-  });
-  document.getElementById('ctrl-prev').addEventListener('click', async () => {
-    const prev = Math.max(currentSlide - 1, 0);
-    goTo(prev);
-    updateControllerUI();
-    await pushSlide(prev);
-  });
-  // also poll so if someone else advances, the counter stays in sync
-  pollTimer = setInterval(async () => {
-    try {
-      const r = await fetch(`${API}?room=${encodeURIComponent(syncRoom)}`, { cache: 'no-store' });
-      const { slide } = await r.json();
-      if (typeof slide === 'number' && slide !== currentSlide) {
-        goTo(slide);
-        updateControllerUI();
-      }
-    } catch (_) {}
-  }, 1200);
-}
-
-// Wire up mode picker
-document.getElementById('btn-projector').addEventListener('click', () => {
-  syncRoom = document.getElementById('room-input').value.trim() || '2026';
-  localStorage.setItem('yh-room', syncRoom);
-  localStorage.setItem('yh-mode', 'projector');
-  startProjector();
-});
-document.getElementById('btn-controller').addEventListener('click', () => {
-  syncRoom = document.getElementById('room-input').value.trim() || '2026';
-  localStorage.setItem('yh-room', syncRoom);
-  localStorage.setItem('yh-mode', 'controller');
-  startController();
-});
-
-// Restore last mode from localStorage (skip picker if already chosen)
-(function restoreMode() {
-  const savedRoom = localStorage.getItem('yh-room');
-  const savedMode = localStorage.getItem('yh-mode');
-  if (savedRoom) document.getElementById('room-input').value = savedRoom;
-  // Don't auto-restore — always show picker so user confirms intentionally
-})();
 </script>
 </body>
 </html>
