@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>יום הזיכרון 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&family=Frank+Ruhl+Libre:wght@400;700;900&display=swap');
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    background: #000;
+    font-family: 'Heebo', 'Frank Ruhl Libre', sans-serif;
+    cursor: none;
+  }
+
+  #slideshow {
+    width: 100vw; height: 100vh;
+    position: relative;
+    perspective: 1200px;
+  }
+
+  .slide {
+    position: absolute; inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    z-index: 0;
+    transition: opacity 0.5s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    z-index: 1;
+  }
+
+  /* ── Background layer with parallax depth ── */
+  .slide-bg {
+    position: absolute; inset: -30px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    filter: brightness(0.6) saturate(1.1);
+    will-change: transform, filter;
+  }
+  .slide.active .slide-bg {
+    animation: breatheFilter 7s ease-in-out infinite;
+  }
+
+  @keyframes breatheFilter {
+    0%, 100% { filter: brightness(0.6) saturate(1.1); }
+    50%      { filter: brightness(0.65) saturate(1.15); }
+  }
+
+  /* ── Cinematic gradient overlays ── */
+  .slide-overlay {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse at 50% 40%, transparent 30%, rgba(0,0,0,0.3) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.08) 0%, transparent 20%, transparent 80%, rgba(0,0,0,0.25) 100%);
+    z-index: 1;
+  }
+
+  /* ── Floating particles canvas ── */
+  #particles {
+    position: fixed; inset: 0;
+    z-index: 50;
+    pointer-events: none;
+    opacity: 0.4;
+  }
+
+  /* ── Content card with frosted glass ── */
+  .slide-content {
+    position: relative;
+    z-index: 2;
+    width: 88%;
+    max-width: 1180px;
+    text-align: center;
+    padding: 2.8rem 3.2rem;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 28px;
+    backdrop-filter: blur(8px) saturate(1.2);
+    -webkit-backdrop-filter: blur(8px) saturate(1.2);
+    box-shadow:
+      0 8px 32px rgba(0,0,0,0.4),
+      inset 0 1px 0 rgba(255,255,255,0.05);
+    transform: translateZ(0);
+    opacity: 0;
+    transition: opacity 0.4s 0.1s ease, transform 0.4s 0.1s ease;
+  }
+  .slide.active .slide-content {
+    opacity: 1;
+    transform: translateZ(40px);
+  }
+
+  .slide-content.no-card {
+    background: none;
+    border: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    box-shadow: none;
+  }
+
+  /* ── Title typography ── */
+  .slide-title {
+    font-family: 'Frank Ruhl Libre', 'Heebo', serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 5vw, 4.5rem);
+    color: #fff;
+    text-shadow:
+      0 0 60px rgba(255,255,255,0.15),
+      0 0 40px rgba(0,0,0,0.9),
+      0 2px 4px rgba(0,0,0,0.8);
+    line-height: 1.5;
+    letter-spacing: 0.02em;
+  }
+
+  .slide-title.title-slide {
+    font-size: clamp(3rem, 7vw, 6rem);
+    letter-spacing: 0.06em;
+    animation: titleGlow 4s ease-in-out infinite;
+  }
+
+  @keyframes titleGlow {
+    0%, 100% { text-shadow: 0 0 60px rgba(255,255,255,0.1), 0 0 40px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8); }
+    50%      { text-shadow: 0 0 80px rgba(255,255,255,0.2), 0 0 50px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.8); }
+  }
+
+  /* ── Lyrics typography ── */
+  .slide-lyrics {
+    font-family: 'Heebo', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1rem, 2.2vw, 1.75rem);
+    color: rgba(255,255,255,0.95);
+    text-shadow:
+      0 0 20px rgba(0,0,0,0.8),
+      0 1px 2px rgba(0,0,0,0.6);
+    line-height: 2;
+    letter-spacing: 0.015em;
+    max-height: 82vh;
+    overflow-y: auto;
+  }
+  .slide-lyrics > div {
+    transition: opacity 0.3s;
+  }
+
+  .slide-lyrics.dense {
+    font-size: clamp(0.85rem, 1.7vw, 1.35rem);
+    line-height: 1.9;
+  }
+
+  .slide-lyrics.two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem 2.5rem;
+    text-align: right;
+  }
+
+  .slide-lyrics.prayer {
+    font-family: 'Frank Ruhl Libre', serif;
+    font-weight: 700;
+    font-size: clamp(1.1rem, 2.5vw, 2rem);
+    line-height: 2.2;
+    color: rgba(255,255,255,0.97);
+  }
+
+  .col { text-align: center; }
+
+  /* ── Bottom UI ── */
+  .slide-number {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.35);
+    font-size: 0.8rem;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 300;
+    z-index: 100;
+    pointer-events: none;
+    direction: ltr;
+    unicode-bidi: bidi-override;
+    letter-spacing: 0.15em;
+  }
+
+  .progress-bar {
+    position: fixed;
+    bottom: 0; left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.08), rgba(255,255,255,0.4), rgba(255,255,255,0.08));
+    transition: width 0.4s ease;
+    z-index: 100;
+    box-shadow: 0 0 12px rgba(255,255,255,0.15);
+  }
+
+  .nav-hint {
+    position: fixed;
+    bottom: 3.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255,255,255,0.25);
+    font-size: 0.7rem;
+    font-family: 'Heebo', sans-serif;
+    font-weight: 300;
+    z-index: 100;
+    pointer-events: none;
+    white-space: nowrap;
+    letter-spacing: 0.1em;
+    animation: hintFade 1s 3s both;
+  }
+
+  @keyframes hintFade {
+    from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+    to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+  }
+
+  /* ── Vignette frame ── */
+  .vignette {
+    position: fixed; inset: 0;
+    z-index: 60;
+    pointer-events: none;
+    box-shadow: inset 0 0 120px 30px rgba(0,0,0,0.3);
+  }
+
+  ::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<div id="slideshow"></div>
+<canvas id="particles"></canvas>
+<div class="vignette"></div>
+<div class="progress-bar" id="progress"></div>
+<div class="slide-number" id="slideNum"></div>
+<div class="nav-hint">← → לניווט בין השירים</div>
+
+<script>
+const slides = [
+  {
+    bg: "slides/slide_01.jpg",
+    type: "title",
+    lines: ["יום הזיכרון 2026"]
+  },
+  {
+    bg: "slides/slide_02.jpg",
+    type: "lyrics",
+    lines: [
+      "אלי, אלי",
+      "שלא יגמר לעולם",
+      "החול והים,",
+      "רשרוש של המים,",
+      "ברק השמיים,",
+      "תפילת האדם."
+    ]
+  },
+  {
+    bg: "slides/slide_03.jpg",
+    type: "two-col",
+    col1: [
+      "הולך אני כעת במשעול ההווה",
+      "כילד ההולך לו לאיבוד",
+      "כפות ידי הן מושטות",
+      "מבקשות את העזרה להמשיך איתך את המסע",
+      "ובצדדים הפרחים כאילו איבדו את זהותם",
+      "מחפשים עוד קרן אור שתעזור",
+      "עוד לגימה קטנה של מים ממעייני החוכמה",
+      "תביא להם את התקווה",
+      "ארים ראשי, אשא עיני אל ההרים במרחקים",
+      "וקולי ישמע כזעקה, כתפילת האדם",
+      "וליבי יקרא מאין יבוא עזרי"
+    ],
+    col2: [
+      "עובר אני כעת בין נופים חדשים",
+      "הצעדים הם נעשים כה איטיים",
+      "מה יש שם שאין פה שאל אותי עובר",
+      "מה בלב אתה שומר",
+      "קשיש העיר כשעל גבו מונח כל עברו",
+      "מביט סביב ומחפש את עולמו",
+      "כשההווה כל כך קשה",
+      "לא אומר דבר, ארים ראשי אל המחר",
+      "ארים ראשי…"
+    ]
+  },
+  {
+    bg: "slides/slide_04.jpg",
+    type: "prayer",
+    lines: [
+      "מִי שֶׁבֵּרַךְ אֲבוֹתֵינוּ אַבְרָהָם יִצְחָק וְיַעֲקֹב הוּא יְבָרֵךְ אֶת חַיָּלֵי צְבָא הֲגַנָּה לְיִשְׂרָאֵל",
+      "הָעוֹמְדִים עַל מִשְׁמַר אַרְצֵנוּ וְעָרֵי אֱלהֵינוּ מִגְּבוּל הַלְּבָנוֹן וְעַד מִדְבַּר מִצְרַיִם וּמִן הַיָּם הַגָּדוֹל עַד לְבוֹא הָעֲרָבָה בַּיַּבָּשָׁה בָּאֲוִיר וּבַיָּם."
+    ]
+  },
+  {
+    bg: "slides/slide_05.png",
+    type: "lyrics",
+    lines: [
+      "בַּחֲצִי הַלַּיְלָה הֵם קָמוּ",
+      "וְהִכּוּ בִּקְצֵה הָעוֹלָם",
+      "כִּבְנֵי רֶשֶׁף חָשׁוּ הִרְחִיקוּ עוּף",
+      "לְהָשִׁיב אֶת כְּבוֹד הָאָדָם",
+      "אֶל אֶרֶץ צְבִי",
+      "אֶל דְּבַשׁ שְׂדוֹתֶיהָ",
+      "אֶל הַכַּרְמֶל וְהַמִּדְבָּר",
+      "אֶל עַם אֲשֶׁר לֹא יֶחֱשֶׁה",
+      "שֶׁאֶת בָּנָיו לֹא יַפְקִיר לְזָר,",
+      "אֶל אֶרֶץ צְבִי שֶׁבְּהָרֶיהָ",
+      "פּוֹעֶמֶת עִיר מִדּוֹר לְדוֹר",
+      "אֶל אֶרֶץ אֵם לְטַבּוּרָהּ",
+      "קְשׁוּרִים בָּנֶיהָ בְּטוֹב וּבְרַע."
+    ]
+  },
+  {
+    bg: "slides/slide_06.jpg",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "אני יושב עכשיו קרוב אל השמיים",
+      "מנסה למצוא תשובות לשאלה",
+      "על הדרך גם חולץ ת\u2019נעליים",
+      "חיילים עכשיו עוזבים את המרכבה",
+      "כן אני יושב שם, חושב",
+      "קצת עלייך, להכאיב מעט ללב",
+      "את המשפט הבא את בטח מכירה",
+      "יום יומיים אני בא בחזרה",
+      "נגמר, נגמר, נגמר",
+      "ובדרך כשיצאנו אל הבית",
+      "אז עצרנו בפלאפל בפינה",
+      "ואנשים שם הסתכלו מחאו כפיים",
+      "הגיבורים שלנו אמרו באהבה",
+      "ואני עומד שם מסתתר",
+      "קצת גדול עלי להיות זה ששומר",
+      "ובין ביס לביס עולה בי מחשבה",
+      "לעזאזל כמה גיבורים יש במדינה"
+    ],
+    col2: [
+      "נגמר, נגמר, נגמר",
+      "נגמר, נגמר, נגמר",
+      "ומאז אפשר למנות כמעט שנתיים",
+      "והיום אני עסוק בהשלמה",
+      "בעוד רגע כבר אשמע את הכפיים",
+      "ואז אצעק בכל כוחי מהבמה",
+      "ואם שומעים אם מקשיבים",
+      "עוד אפשר למצוא כאב בין המילים",
+      "ומבטיח לא אכתוב על זה יותר",
+      "רק בפעם הבאה שאשבר",
+      "נגמר, נגמר, נגמר",
+      "נגמר, נגמר, נגמר",
+      "יש מדינה אחת על יד ירושלים",
+      "שם עדיין משתוללת מלחמה",
+      "כי אנשים שם מאבדים את העיניים",
+      "לא מחכים לגיבורים באף פינה",
+      "נגמר, נגמר, נגמר"
+    ]
+  },
+  {
+    bg: "slides/slide_07.jpg",
+    type: "lyrics",
+    lines: [
+      "אני הולך לבכות לך",
+      "תהיה חזק למעלה",
+      "געגועי כמו דלתות",
+      "שנפתחות בלילה",
+      "לנצח אחי אזכור אותך תמיד",
+      "וניפגש בסוף, אתה יודע",
+      "ויש לי חברים אבל גם הם כבים",
+      "אל מול אורך המשגע",
+      "כשעצובים הולכים לים",
+      "לכן הים מלוח",
+      "וזה עצוב שלהחזיר ציוד אפשר",
+      "לא געגוע",
+      "לנצח אחי...",
+      "וכמו הגלים אנחנו מתנפצים",
+      "אל המזח אל החיים"
+    ]
+  },
+  {
+    bg: "slides/slide_08.jpg",
+    type: "prayer",
+    lines: [
+      "אחינו כל בית ישראל",
+      "הנתונים בצרה, בצרה ובשביה",
+      "העומדים בין בים ובין ביבשה",
+      "המקום ירחם ירחם עליהם",
+      "ֿויוציאם מצרה לרווחה",
+      "ומאפלה לאורה ומשיעבוד לגאולה",
+      "השתא בעגלא ובזמן קריב"
+    ]
+  },
+  {
+    bg: "slides/slide_09.png",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "תרקדי",
+      "השירים עושים לך טוב",
+      "כולם חברים כאן",
+      "אחים אחיות",
+      "תרקדי",
+      "נו תעופי בלי לחשוב",
+      "פה ושם תירגעי קצת",
+      "תשמרי לך כוחות",
+      "אולי תברחי, אין לנו זמן",
+      "אולי תברחי, הם עוד מעט כאן",
+      "ואם תשמעי",
+      "צליפות הדשא, חוטי עשן",
+      "תרוצי מהר את נגד הזמן",
+      "שריקות ההדף, עמודי הענן",
+      "אל תעצרי אני בדרך",
+      "ואם עייפת",
+      "את בטח רוקדת לך שם"
+    ],
+    col2: [
+      "תרקדי אל תדאגי זה הנוף",
+      "שכלום לא יזיז לך",
+      "גם לא אש הקרבות",
+      "תרקדי",
+      "נתראה בקרוב",
+      "כולם מחכים לך",
+      "רק עוד כמה שבתות",
+      "אל תדאגי, ייקח לנו זמן",
+      "אל תדאגי, את עוד מעט כאן",
+      "ואם תשמעי",
+      "שריטות הנפש, פצעי הדם",
+      "אל תעצרי כי את לוחמת",
+      "ואם עייפת",
+      "את בטח רוקדת לך שם"
+    ]
+  },
+  {
+    bg: "slides/slide_10.jpg",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "ריבונו של עולם אם נדבר גלויות",
+      "לפעמים אין לי כוח בעולמך להיות",
+      "אנה מפניך אסתתר",
+      "מה אטען, מה אצטדק, מה אדבר",
+      "חנון ורחום הן לפניך גלוי",
+      "כאן יהודי שעל חוט השערה הוא תלוי",
+      "נלחם בעצבות בייאוש המכרסם כתולעת",
+      "השמחה נסתלקה ממני, וגם הדעת",
+      "קולות מהעבר לוחשים לי לעצור"
+    ],
+    col2: [
+      "אבל אני מוסיף בחושך לחתור",
+      "ושואל ומבקש",
+      "איה, איה, אייכה",
+      "איה, איה, אייכה",
+      "אייכה",
+      "אותו זקן וכסיל, שולח בי חיצים",
+      "אני הולך וכושל, הוא הולך ומעצים",
+      "נשמה קדושה אל נא תבכי, שבורת כנף",
+      "הן תעידי עליי כמה הייתי נכסף"
+    ]
+  },
+  {
+    bg: "slides/slide_11.jpg",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "אצלנו בגן יש המון ילדים",
+      "את חלקם אני אוהב, את חלקם אני לא מכיר",
+      "אבל מי לא שמע על האומץ של רן",
+      "הוא הכי מהיר בחול, הוא הכי חזק בגן",
+      "אבל יש לו סוד אחד שפחד הוא לגלות",
+      "שהוא כל כך מאוהב באחת הילדות",
+      "אז בלילות קרים",
+      "עם פנס מתחת לשמיכה הם מדברים",
+      "והוא מגלה לה מה היא בשבילו",
+      "כל עולמו מוגן מתחת לשמיכה",
+      "אצלנו בגן יש הרבה חבורות",
+      "יש כאלה נחשבים, יש כאלה שפחות",
+      "אבל מי לא שמע על קופצי הנדנדות",
+      "מריעים להם כפיים, מלמדים אותם לנחות",
+      "מורמים על נס הדגל, גאוות כל האזור",
+      "רק לפעמים כשהם קופצים רחוק הם שוכחים לחזור"
+    ],
+    col2: [
+      "אצלנו בגן נפרדים בשמחה",
+      "כי היום לא ארוך ונפגשים שוב מחר",
+      "חוץ מאלה שפתאום לא חוזרים יותר לגן",
+      "אמרו לי שהם רק עברו דירה מעבר לענן",
+      "אז בלילות קרים",
+      "עם פנס מתחת לשמיכה הם מדברים",
+      "והוא מגלה לה מה היא בשבילו",
+      "היא בוכה כשהוא מציע לה להיות כל עולמו",
+      "בערב שלפני המלחמה",
+      "אצלנו בגדוד יש המון ילדים",
+      "את חלקם אני אוהב, את חלקם אני לא אכיר"
+    ]
+  },
+  {
+    bg: "slides/slide_12.jpg",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "לא רואים בעיניים רק קופצים לאש",
+      "מה כבר רצינו לבקש",
+      "לקבל ולתת מה שיש",
+      "להחזיק בידיים כל יום שעובר",
+      "תמיד הוא ככה ממהר",
+      "אני איש מאחר",
+      "רק בלילות",
+      "עולים קולות",
+      "שאלות אבודות",
+      "מחפשות תשובה",
+      "מה שעוד לא בא"
+    ],
+    col2: [
+      "רסיסים",
+      "למה זיכרונות נמסים",
+      "כמה שאני לא כיסיתי, זה נכנס לי בתריסים",
+      "אין על מי לשים את הראש",
+      "גם אם לא שברתי, שילמתי",
+      "לך תמצא על מי לכעוס",
+      "אין אוויר בשמיים איך אפשר לנשום",
+      "הכל תקוע במקום",
+      "אבל עוד לא הפסקתי לחלום",
+      "אז קפצתי למים כי צריך לשחות",
+      "במים לא רואים דמעות",
+      "במים ישקעו חולות שזוכרים"
+    ]
+  },
+  {
+    bg: "slides/slide_13.jpg",
+    type: "two-col",
+    col1: [
+      "זוכרת דברים שאמרת",
+      "כמו ים שזוכר את החוף",
+      "גלים מגלים את הרוח",
+      "כמו שהלב יגלה מכאוב",
+      "הלילה מעיר את הבוקר",
+      "שמעיר אותי ממיטתי",
+      "ואיך כבר אוכל עוד לברוח",
+      "מזכרונך אל שפיותי",
+      "עד אחרי הנצח",
+      "עד לפני הכל",
+      "ניפגש תראה בסוף",
+      "זמן הוא ים אך לא החוף",
+      "עד קצוות הרוח",
+      "עד יכבה האור",
+      "ניפגש תראה בסוף",
+      "זמן הוא ים אך לא החוף",
+      "תראה בסוף"
+    ],
+    col2: [
+      "כוכב שוב נפל בשמיים",
+      "ומישהו ביקש משאלה",
+      "השמש טובעת במים",
+      "כמו שאני טובעת בך",
+      "לא תדע איך שמחתי בלילה",
+      "כשבאת אלי בחלום",
+      "באור שעל נועם פניך",
+      "ראיתי שטוב שמצאת מקום"
+    ]
+  },
+  {
+    bg: "slides/slide_14.png",
+    type: "lyrics",
+    dense: true,
+    lines: [
+      "בן אדם, מה לך נרדם",
+      "קום קרא בתחנונים",
+      "קול דומייתך לאוזניי כתופים",
+      "אם נא מצאתי חן בעיניך, אבי",
+      "תן לי תפילה אחת טובה",
+      "שתפתח לי את כל השערים",
+      "תן לי מילה אחת כנה",
+      "שתותיר אותי בלי שום אוויר",
+      "אני רוצה להיות תלוי על חוט השערה באמצע הים",
+      "צועק בכל כוחי",
+      "ריבונו של עולם",
+      "מה לך נרדם",
+      "תציל אותי...",
+      "לא בראת אותי",
+      "להתהלך כישן",
+      "אתה מלא אהבה",
+      "אני רוצה גם כן"
+    ]
+  },
+  {
+    bg: "slides/slide_15.jpg",
+    type: "prayer",
+    lines: [
+      "שיר למעלות אֶשָּׂא עֵינַי אֶל הֶהָרִים מֵאַיִן יָבֹא עֶזְרִי:",
+      "עֶזְרִי מֵעִם ה\u2019 עֹשֵׂה שָׁמַיִם וָאָרֶץ:",
+      "אַל יִתֵּן לַמּוֹט רַגְלֶךָ אַל יָנוּם שֹׁמְרֶךָ:",
+      "הִנֵּה לֹא יָנוּם וְלֹא יִישָׁן שׁוֹמֵר יִשְׂרָאֵל:",
+      "ה\u2019 שֹׁמְרֶךָ ה\u2019 צִלְּךָ עַל יַד יְמִינֶךָ:",
+      "יוֹמָם הַשֶּׁמֶשׁ לֹא יַכֶּכָּה וְיָרֵחַ בַּלָּיְלָה:",
+      "ה\u2019 יִשְׁמָרְךָ מִכָּל רָע יִשְׁמֹר אֶת נַפְשֶׁךָ:",
+      "ה\u2019 יִשְׁמָר צֵאתְךָ וּבוֹאֶךָ מֵעַתָּה וְעַד עוֹלָם:"
+    ]
+  },
+  {
+    bg: "slides/slide_16.jpg",
+    type: "prayer",
+    lines: [
+      "תְּפִלָּה לְעָנִי כִי יַעֲטֹף וְלִפְנֵי ה\u2019 יִשְׁפֹּךְ שִׂיחוֹ:",
+      "ה\u2019 שִׁמְעָה תְפִלָּתִי וְשַׁוְעָתִי אֵלֶיךָ תָבוֹא:",
+      "אַל תַּסְתֵּר פָּנֶיךָ מִמֶּנִּי בְּיוֹם צַר לִי"
+    ]
+  },
+  {
+    bg: "slides/slide_17.jpg",
+    type: "lyrics",
+    lines: [
+      "אם תלכי לי",
+      "בשנייה עולמי יקרוס",
+      "ואם אלך לך תצטערי",
+      "על הזמנים בהם היינו יחד",
+      "ושתקנו",
+      "הימים עוברים והשנים רצות",
+      "ואיפה את ואני באמת",
+      "ילדים הולכים אמהות בוכות",
+      "תגידי, מה פה חשוב באמת?",
+      "כמה נתעסק עוד בכאב",
+      "וכמה נתעכב עוד על השונה",
+      "ואיפה לא היינו מי שאנחנו באמת",
+      "הימים עוברים והשנים רצות",
+      "ואיפה את ואני באמת",
+      "ילדים הולכים אמהות בוכות",
+      "תגידי, מה פה חשוב באמת?"
+    ]
+  },
+  {
+    bg: "slides/slide_18.jpg",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "המשפחה, החברים אולי לצאת לבילויים",
+      "שיחות עמוקות שיחות של הנפש בלילה",
+      "להתמודד עם שינויים ההרגלים הישנים",
+      "הנשמה במלחמה עם הקארמה",
+      "עוד יבואו ימים טובים אני מבטיח",
+      "עוד יבואו ימים טובים",
+      "גם בשעות החשוכות של הלילה",
+      "תמיד יהיה כוכב קטן שיאיר לך",
+      "את עצמך את הדרך הביתה",
+      "תמיד זה הכי חשוך לפני הזריחה",
+      "מיליון רכבות דוהרות עד אוסטרליה",
+      "מחפש רחוק את מה שנמצא לך",
+      "מתחת לאף כל מכשול זה מדליה",
+      "קם ונופל אבל בדרך שלך"
+    ],
+    col2: [
+      "להתמודד עם הפחדים",
+      "לקפוץ למים עמוקים",
+      "לשחות עד הסוף",
+      "להגיע לחוף",
+      "עד הלילה",
+      "להאזין גם לשירים",
+      "כי זמרים הם הרופאים",
+      "הכי טובים שיש למדע להציע",
+      "עוד יבואו ימים טובים אני מבטיח",
+      "עוד יבואו ימים טובים"
+    ]
+  },
+  {
+    bg: "slides/slide_19.jpg",
+    type: "prayer",
+    lines: [
+      "למענך אלוקינו עשה,",
+      "ולא לנו,",
+      "ראה עמידתנו,",
+      "דלים וריקים\"",
+      "הנשמה לך",
+      "והגוף פעלך",
+      "חוסה על עמלך"
+    ]
+  },
+  {
+    bg: "slides/slide_20.jpg",
+    type: "lyrics",
+    dense: true,
+    lines: [
+      "ערב ראשון של לבד,",
+      "יושב וכותב לך מכתב",
+      "על כל הדברים שהיו",
+      "כל מה שקרה בדיוק",
+      "אותיות מופיעות על הקיר",
+      "אני הפחד נעים להכיר",
+      "הדמויות אוהבות לשחק",
+      "זזות כאן בבית הריק, הריק",
+      "ואת, את לא יודעת כמה",
+      "ממך ניסיתי להסתיר",
+      "את כל הסיוטים בלילה",
+      "צרחות ודם על המדים",
+      "את לא מבינה כבר למה",
+      "אני מזמן כבר לא אני",
+      "תמונות רצות מאותו לילה",
+      "דמעות, כאב של לוחמים",
+      "זה ערב ראשון שאת שם,",
+      "שוכב וחושב, לא נרדם",
+      "השקט לאט מתנגן",
+      "מקדיש לך עכשיו שיר בלי שם",
+      "שיר בלי שם"
+    ]
+  },
+  {
+    bg: "slides/slide_21.jpg",
+    type: "prayer",
+    lines: [
+      "קול גלגל המתגלגל ממטה למעלה,",
+      "מרכבות סתומות הולכות ומתגלגלות.",
+      "קול נעימות עולה, ויורד,",
+      "הולך ומשוטט בעולם.",
+      "קול שופר נמשך בעומקי המדרגות,",
+      "ומסובב הגלגל סביב.",
+      "זהו קול, זהו קול גלגל עולה ויורד."
+    ]
+  },
+  {
+    bg: "slides/slide_23.jpg",
+    type: "two-col",
+    dense: true,
+    col1: [
+      "אסור לך לחשוב",
+      "כשאת כל כך עייפה",
+      "צאי לטיול לאור זריחה",
+      "רחוקה מהבית",
+      "השביל לחזור נמחק",
+      "הולכת על חבל דק",
+      "הלילות ארוכים",
+      "בלי לדעת למה",
+      "בורחת ואין רודף",
+      "עד מחר",
+      "עוד מעט",
+      "ילד רץ אלייך",
+      "מחבק אותך"
+    ],
+    col2: [
+      "נקיף את הפארק",
+      "רק להפסיק לחשוב",
+      "אנשים עייפים רצים ברחוב",
+      "היינו פה כבר קודם",
+      "בתפקיד הפוך",
+      "הליכה מהירה, להתיש את הגוף",
+      "יש פרצה בגדר",
+      "בין הגפנים, בין ענבי הכרם",
+      "שועלים מחבלים, מייללים",
+      "ונעלמים…"
+    ]
+  },
+  {
+    bg: "slides/slide_24.jpg",
+    type: "prayer",
+    lines: [
+      "אֲנִי מַאֲמִין בֶּאֱמוּנָה שְׁלֵמָה בְּבִיאַת הַמָּשִׁיחַ",
+      "וְאַף עַל פִּי שֶׁיִּתְמַהְמֵהַּ",
+      "עִם כָּל זֶה אֲחַכֶּה לּוֹ בְּכָל יוֹם",
+      "שֶׁיָּבוֹא"
+    ]
+  }
+];
+
+let currentSlide = 0;
+
+// ── Floating particles ──
+const canvas = document.getElementById('particles');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+
+function createParticles() {
+  particles = [];
+  const count = Math.floor((canvas.width * canvas.height) / 18000);
+  for (let i = 0; i < count; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      r: Math.random() * 1.8 + 0.3,
+      dx: (Math.random() - 0.5) * 0.15,
+      dy: -Math.random() * 0.25 - 0.05,
+      opacity: Math.random() * 0.5 + 0.1,
+      pulse: Math.random() * Math.PI * 2,
+      pulseSpeed: Math.random() * 0.008 + 0.003
+    });
+  }
+}
+createParticles();
+
+function drawParticles() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  for (const p of particles) {
+    p.x += p.dx;
+    p.y += p.dy;
+    p.pulse += p.pulseSpeed;
+    const o = p.opacity * (0.6 + 0.4 * Math.sin(p.pulse));
+
+    if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width; }
+    if (p.x < -10) p.x = canvas.width + 10;
+    if (p.x > canvas.width + 10) p.x = -10;
+
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255,255,255,${o})`;
+    ctx.fill();
+  }
+  requestAnimationFrame(drawParticles);
+}
+drawParticles();
+
+// ── Preload all slide images immediately ──
+slides.forEach(s => { const img = new Image(); img.src = s.bg; });
+
+// ── Unified breathing + parallax via single rAF (no CSS transform conflicts) ──
+let mouseX = 0.5, mouseY = 0.5;
+let targetX = 0.5, targetY = 0.5;
+
+document.addEventListener('mousemove', e => {
+  targetX = e.clientX / window.innerWidth;
+  targetY = e.clientY / window.innerHeight;
+});
+
+(function animateBg(ts) {
+  // Smooth mouse lerp
+  mouseX += (targetX - mouseX) * 0.06;
+  mouseY += (targetY - mouseY) * 0.06;
+
+  // Gentle scale breathe (1.10 → 1.14)
+  const scale = 1.12 + Math.sin(ts * 0.00045) * 0.02;
+  const ox = (mouseX - 0.5) * -10;
+  const oy = (mouseY - 0.5) * -7;
+
+  const bg = document.querySelector('.slide.active .slide-bg');
+  if (bg) bg.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
+
+  requestAnimationFrame(animateBg);
+})(0);
+
+// ── Build slides ──
+function buildSlides() {
+  const container = document.getElementById('slideshow');
+
+  slides.forEach((s, idx) => {
+    const div = document.createElement('div');
+    div.className = 'slide' + (idx === 0 ? ' active' : '');
+    div.dataset.index = idx;
+
+    const bg = document.createElement('div');
+    bg.className = 'slide-bg';
+    bg.style.backgroundImage = `url('${s.bg}')`;
+    div.appendChild(bg);
+
+    const overlay = document.createElement('div');
+    overlay.className = 'slide-overlay';
+    div.appendChild(overlay);
+
+    const content = document.createElement('div');
+    content.className = 'slide-content';
+
+    if (s.type === 'title') {
+      content.classList.add('no-card');
+      const h = document.createElement('div');
+      h.className = 'slide-title title-slide';
+      h.textContent = s.lines[0];
+      content.appendChild(h);
+    } else if (s.type === 'two-col') {
+      const lyricsDiv = document.createElement('div');
+      lyricsDiv.className = 'slide-lyrics two-col' + (s.dense ? ' dense' : '');
+
+      const c1 = document.createElement('div');
+      c1.className = 'col';
+      c1.innerHTML = s.col1.map(l => `<div>${l}</div>`).join('');
+
+      const c2 = document.createElement('div');
+      c2.className = 'col';
+      c2.innerHTML = s.col2.map(l => `<div>${l}</div>`).join('');
+
+      lyricsDiv.appendChild(c1);
+      lyricsDiv.appendChild(c2);
+      content.appendChild(lyricsDiv);
+    } else {
+      const cls = s.type === 'prayer' ? 'slide-lyrics prayer' : 'slide-lyrics';
+      const lyricsDiv = document.createElement('div');
+      lyricsDiv.className = cls + (s.dense ? ' dense' : '');
+      lyricsDiv.innerHTML = s.lines.map(l => `<div>${l}</div>`).join('');
+      content.appendChild(lyricsDiv);
+    }
+
+    div.appendChild(content);
+    container.appendChild(div);
+  });
+
+  updateIndicator();
+}
+
+function goTo(idx) {
+  if (idx < 0 || idx >= slides.length) return;
+  const allSlides = document.querySelectorAll('.slide');
+  allSlides[currentSlide].classList.remove('active');
+  currentSlide = idx;
+  allSlides[currentSlide].classList.add('active');
+  updateIndicator();
+}
+
+function next() { goTo(currentSlide + 1); }
+function prev() { goTo(currentSlide - 1); }
+
+function updateIndicator() {
+  document.getElementById('slideNum').textContent =
+    `${currentSlide + 1} / ${slides.length}`;
+  document.getElementById('progress').style.width =
+    `${((currentSlide + 1) / slides.length) * 100}%`;
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown') {
+    e.preventDefault(); next();
+  } else if (e.key === 'ArrowRight' || e.key === 'ArrowUp' || e.key === 'PageUp') {
+    e.preventDefault(); prev();
+  } else if (e.key === 'Home') {
+    e.preventDefault(); goTo(0);
+  } else if (e.key === 'End') {
+    e.preventDefault(); goTo(slides.length - 1);
+  } else if (e.key === 'f' || e.key === 'F') {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+    else document.exitFullscreen();
+  }
+});
+
+document.addEventListener('click', e => {
+  const w = window.innerWidth;
+  if (e.clientX < w * 0.35) prev(); else next();
+});
+
+let touchStartX = 0;
+document.addEventListener('touchstart', e => { touchStartX = e.touches[0].clientX; });
+document.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  if (Math.abs(dx) > 50) { if (dx > 0) prev(); else next(); }
+});
+
+buildSlides();
+</script>
+</body>
+</html>
