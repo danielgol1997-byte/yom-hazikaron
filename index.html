@@ -122,15 +122,16 @@
   }
 
   /* ── Lyrics typography ── */
+  /* vh-based font sizes so content always fits the screen height */
   .slide-lyrics {
     font-family: 'Heebo', sans-serif;
     font-weight: 700;
-    font-size: clamp(1rem, 2.2vw, 1.75rem);
+    font-size: clamp(0.9rem, 2.4vh, 1.6rem);
     color: rgba(255,255,255,0.95);
     text-shadow:
       0 0 20px rgba(0,0,0,0.8),
       0 1px 2px rgba(0,0,0,0.6);
-    line-height: 2;
+    line-height: 1.9;
     letter-spacing: 0.015em;
   }
   .slide-lyrics > div {
@@ -138,22 +139,22 @@
   }
 
   .slide-lyrics.dense {
-    font-size: clamp(0.85rem, 1.7vw, 1.35rem);
-    line-height: 1.9;
+    font-size: clamp(0.75rem, 1.8vh, 1.2rem);
+    line-height: 1.75;
   }
 
   .slide-lyrics.two-col {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1.2rem 2.5rem;
+    gap: 1rem 2rem;
     text-align: right;
   }
 
   .slide-lyrics.prayer {
     font-family: 'Frank Ruhl Libre', serif;
     font-weight: 700;
-    font-size: clamp(1.1rem, 2.5vw, 2rem);
-    line-height: 2.2;
+    font-size: clamp(1rem, 2.6vh, 1.8rem);
+    line-height: 2.1;
     color: rgba(255,255,255,0.97);
   }
 
@@ -1161,6 +1162,7 @@ const API = '/api/slide';
 let syncRoom = '2026';
 let syncMode = null; // 'projector' | 'controller'
 let pollTimer = null;
+let lastApiSlide = -1; // tracks the last value received FROM the API
 
 // Derive a short song title/description from a slide object for the controller UI
 function slideSummary(s) {
@@ -1192,7 +1194,10 @@ async function pollSlide() {
   try {
     const r = await fetch(`${API}?room=${encodeURIComponent(syncRoom)}`, { cache: 'no-store' });
     const { slide } = await r.json();
-    if (typeof slide === 'number' && slide !== currentSlide) {
+    // Only jump if the remote value changed — not just because we navigated locally.
+    // This prevents the projector from being reset to 0 when no controller is active.
+    if (typeof slide === 'number' && slide !== lastApiSlide) {
+      lastApiSlide = slide;
       goTo(slide);
     }
   } catch (_) { /* offline — ignore */ }
@@ -1202,7 +1207,9 @@ function startProjector() {
   syncMode = 'projector';
   document.getElementById('mode-picker').style.display = 'none';
   document.body.style.cursor = 'none';
-  // override goTo to also not push (projector is receiver only)
+  // Seed lastApiSlide and push current position so the API starts in sync
+  lastApiSlide = currentSlide;
+  pushSlide(currentSlide);
   pollTimer = setInterval(pollSlide, 600);
 }
 
