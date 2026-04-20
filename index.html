@@ -214,6 +214,23 @@
     box-shadow: inset 0 0 120px 30px rgba(0,0,0,0.3);
   }
 
+  /* ── Musical key badge (for musicians) ── */
+  .slide-key {
+    position: absolute;
+    bottom: 1.4rem;
+    left: 1.6rem;
+    z-index: 10;
+    font-family: 'Heebo', monospace, sans-serif;
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: rgba(255,255,255,0.28);
+    direction: ltr;
+    unicode-bidi: bidi-override;
+    pointer-events: none;
+    user-select: none;
+  }
+
   ::-webkit-scrollbar { width: 0; }
 </style>
 </head>
@@ -236,6 +253,7 @@ const slides = [
   {
     bg: "slides/slide_02.jpg",
     type: "lyrics",
+    key: "Am",
     lines: [
       "אלי, אלי",
       "שלא יגמר לעולם",
@@ -248,6 +266,7 @@ const slides = [
   {
     bg: "slides/slide_03.jpg",
     type: "two-col",
+    key: "Fm",
     col1: [
       "הולך אני כעת במשעול ההווה",
       "כילד ההולך לו לאיבוד",
@@ -276,6 +295,7 @@ const slides = [
   {
     bg: "slides/slide_04.jpg",
     type: "prayer",
+    key: "Cm",
     lines: [
       "מִי שֶׁבֵּרַךְ אֲבוֹתֵינוּ אַבְרָהָם יִצְחָק וְיַעֲקֹב הוּא יְבָרֵךְ אֶת חַיָּלֵי צְבָא הֲגַנָּה לְיִשְׂרָאֵל",
       "הָעוֹמְדִים עַל מִשְׁמַר אַרְצֵנוּ וְעָרֵי אֱלהֵינוּ מִגְּבוּל הַלְּבָנוֹן וְעַד מִדְבַּר מִצְרַיִם וּמִן הַיָּם הַגָּדוֹל עַד לְבוֹא הָעֲרָבָה בַּיַּבָּשָׁה בָּאֲוִיר וּבַיָּם."
@@ -284,6 +304,7 @@ const slides = [
   {
     bg: "slides/slide_05.png",
     type: "lyrics",
+    key: "Cm",
     lines: [
       "בַּחֲצִי הַלַּיְלָה הֵם קָמוּ",
       "וְהִכּוּ בִּקְצֵה הָעוֹלָם",
@@ -303,6 +324,7 @@ const slides = [
   {
     bg: "slides/slide_06.jpg",
     type: "two-col",
+    key: "C#",
     dense: true,
     col1: [
       "אני יושב עכשיו קרוב אל השמיים",
@@ -346,6 +368,7 @@ const slides = [
   {
     bg: "slides/slide_07.jpg",
     type: "lyrics",
+    key: "Em",
     lines: [
       "אני הולך לבכות לך",
       "תהיה חזק למעלה",
@@ -367,6 +390,7 @@ const slides = [
   {
     bg: "slides/slide_08.jpg",
     type: "prayer",
+    key: "Cm",
     lines: [
       "אחינו כל בית ישראל",
       "הנתונים בצרה, בצרה ובשביה",
@@ -380,6 +404,7 @@ const slides = [
   {
     bg: "slides/slide_09.png",
     type: "two-col",
+    key: "F#m",
     dense: true,
     col1: [
       "תרקדי",
@@ -420,6 +445,7 @@ const slides = [
   {
     bg: "slides/slide_10.jpg",
     type: "two-col",
+    key: "C",
     dense: true,
     col1: [
       "ריבונו של עולם אם נדבר גלויות",
@@ -447,6 +473,7 @@ const slides = [
   {
     bg: "slides/slide_11.jpg",
     type: "two-col",
+    key: "Cm",
     dense: true,
     col1: [
       "אצלנו בגן יש המון ילדים",
@@ -483,6 +510,7 @@ const slides = [
   {
     bg: "slides/slide_12.jpg",
     type: "two-col",
+    key: "Bm",
     dense: true,
     col1: [
       "לא רואים בעיניים רק קופצים לאש",
@@ -515,6 +543,7 @@ const slides = [
   {
     bg: "slides/slide_13.jpg",
     type: "two-col",
+    key: "Cm",
     col1: [
       "זוכרת דברים שאמרת",
       "כמו ים שזוכר את החוף",
@@ -548,6 +577,7 @@ const slides = [
   {
     bg: "slides/slide_14.png",
     type: "lyrics",
+    key: "Em",
     dense: true,
     lines: [
       "בן אדם, מה לך נרדם",
@@ -878,6 +908,13 @@ function buildSlides() {
       lyricsDiv.className = cls + (s.dense ? ' dense' : '');
       lyricsDiv.innerHTML = s.lines.map(l => `<div>${l}</div>`).join('');
       content.appendChild(lyricsDiv);
+    }
+
+    if (s.key) {
+      const keyEl = document.createElement('div');
+      keyEl.className = 'slide-key';
+      keyEl.textContent = s.key;
+      div.appendChild(keyEl);
     }
 
     div.appendChild(content);
