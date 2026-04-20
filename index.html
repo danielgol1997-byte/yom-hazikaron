@@ -71,6 +71,9 @@
     z-index: 2;
     width: 88%;
     max-width: 1180px;
+    /* cap height so long lyrics never exceed the viewport */
+    max-height: calc(100vh - 5rem);
+    overflow-y: auto;
     text-align: center;
     padding: 2.8rem 3.2rem;
     background: rgba(0,0,0,0.35);
@@ -129,8 +132,6 @@
       0 1px 2px rgba(0,0,0,0.6);
     line-height: 2;
     letter-spacing: 0.015em;
-    max-height: 82vh;
-    overflow-y: auto;
   }
   .slide-lyrics > div {
     transition: opacity 0.3s;
