@@ -20,7 +20,6 @@
   #slideshow {
     width: 100vw; height: 100vh;
     position: relative;
-    perspective: 1200px;
   }
 
   .slide {
@@ -46,15 +45,7 @@
     background-position: center;
     background-repeat: no-repeat;
     filter: brightness(0.6) saturate(1.1);
-    will-change: transform, filter;
-  }
-  .slide.active .slide-bg {
-    animation: breatheFilter 7s ease-in-out infinite;
-  }
-
-  @keyframes breatheFilter {
-    0%, 100% { filter: brightness(0.6) saturate(1.1); }
-    50%      { filter: brightness(0.65) saturate(1.15); }
+    will-change: transform;
   }
 
   /* ── Cinematic gradient overlays ── */
@@ -82,7 +73,7 @@
     max-width: 1180px;
     text-align: center;
     padding: 2.8rem 3.2rem;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.35);
     border: 1px solid rgba(255,255,255,0.06);
     border-radius: 28px;
     backdrop-filter: blur(8px) saturate(1.2);
@@ -90,13 +81,13 @@
     box-shadow:
       0 8px 32px rgba(0,0,0,0.4),
       inset 0 1px 0 rgba(255,255,255,0.05);
-    transform: translateZ(0);
     opacity: 0;
-    transition: opacity 0.4s 0.1s ease, transform 0.4s 0.1s ease;
+    transform: translateY(10px);
+    transition: opacity 0.4s 0.08s ease, transform 0.4s 0.08s ease;
   }
   .slide.active .slide-content {
     opacity: 1;
-    transform: translateZ(40px);
+    transform: translateY(0);
   }
 
   .slide-content.no-card {
@@ -124,12 +115,7 @@
   .slide-title.title-slide {
     font-size: clamp(3rem, 7vw, 6rem);
     letter-spacing: 0.06em;
-    animation: titleGlow 4s ease-in-out infinite;
-  }
-
-  @keyframes titleGlow {
-    0%, 100% { text-shadow: 0 0 60px rgba(255,255,255,0.1), 0 0 40px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8); }
-    50%      { text-shadow: 0 0 80px rgba(255,255,255,0.2), 0 0 50px rgba(0,0,0,0.8), 0 2px 4px rgba(0,0,0,0.8); }
+    text-shadow: 0 0 80px rgba(255,255,255,0.15), 0 0 40px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.8);
   }
 
   /* ── Lyrics typography ── */
@@ -815,9 +801,10 @@ drawParticles();
 // ── Preload all slide images immediately ──
 slides.forEach(s => { const img = new Image(); img.src = s.bg; });
 
-// ── Unified breathing + parallax via single rAF (no CSS transform conflicts) ──
+// ── Unified breathing + parallax via single rAF (no CSS animation conflicts) ──
 let mouseX = 0.5, mouseY = 0.5;
 let targetX = 0.5, targetY = 0.5;
+let activeBg = null; // cached reference updated on slide change
 
 document.addEventListener('mousemove', e => {
   targetX = e.clientX / window.innerWidth;
@@ -825,17 +812,20 @@ document.addEventListener('mousemove', e => {
 });
 
 (function animateBg(ts) {
-  // Smooth mouse lerp
   mouseX += (targetX - mouseX) * 0.06;
   mouseY += (targetY - mouseY) * 0.06;
 
-  // Gentle scale breathe (1.10 → 1.14)
   const scale = 1.12 + Math.sin(ts * 0.00045) * 0.02;
   const ox = (mouseX - 0.5) * -10;
   const oy = (mouseY - 0.5) * -7;
+  // breathe filter driven here so there's no competing CSS animation
+  const brightness = 0.6 + Math.sin(ts * 0.00045) * 0.025;
+  const saturate  = 1.1 + Math.sin(ts * 0.00045) * 0.025;
 
-  const bg = document.querySelector('.slide.active .slide-bg');
-  if (bg) bg.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
+  if (activeBg) {
+    activeBg.style.transform = `scale(${scale}) translate(${ox}px, ${oy}px)`;
+    activeBg.style.filter = `brightness(${brightness}) saturate(${saturate})`;
+  }
 
   requestAnimationFrame(animateBg);
 })(0);
@@ -900,9 +890,14 @@ function buildSlides() {
 function goTo(idx) {
   if (idx < 0 || idx >= slides.length) return;
   const allSlides = document.querySelectorAll('.slide');
-  allSlides[currentSlide].classList.remove('active');
+  const leaving = allSlides[currentSlide];
+  // reset the outgoing bg so it doesn't keep a stale inline filter/transform
+  const leavingBg = leaving.querySelector('.slide-bg');
+  if (leavingBg) { leavingBg.style.transform = ''; leavingBg.style.filter = ''; }
+  leaving.classList.remove('active');
   currentSlide = idx;
   allSlides[currentSlide].classList.add('active');
+  activeBg = allSlides[currentSlide].querySelector('.slide-bg');
   updateIndicator();
 }
 
@@ -944,6 +939,8 @@ document.addEventListener('touchend', e => {
 });
 
 buildSlides();
+// initialise the cached bg reference for slide 0
+activeBg = document.querySelector('.slide.active .slide-bg');
 </script>
 </body>
 </html>
